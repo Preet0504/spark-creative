@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import Sidebar from './Sidebar';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth.ts';
 import { Navigate } from 'react-router-dom';
 
 interface MainLayoutProps {
