@@ -21,16 +21,16 @@ export interface Course {
   code: string;
   title: string;
   credits: number;
-  schoolId: string;
-  description: string;
-  prerequisites: string[];
+  school_id: string | null;
+  description: string | null;
+  prerequisites: string[] | null;
   semester: 'fall' | 'spring' | 'summer';
-  maxStudents: number;
+  max_students: number;
 }
 
 export interface CourseSection {
   id: string;
-  courseId: string;
+  course_id: string;
   section: string;
   instructor: string;
   schedule: {
@@ -43,10 +43,10 @@ export interface CourseSection {
 
 export interface Enrollment {
   id: string;
-  studentId: string;
-  sectionId: string;
-  courseId: string;
+  student_id: string;
+  section_id: string;
+  course_id: string;
   status: 'enrolled' | 'pending' | 'dropped';
-  grade?: string;
-  enrolledAt: string;
+  grade?: string | null;
+  enrolled_at: string;
 }

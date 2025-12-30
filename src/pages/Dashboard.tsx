@@ -1,8 +1,11 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useCourses } from '@/hooks/useCourses';
+import { useSchools } from '@/hooks/useSchools';
+import { useEnrollments } from '@/hooks/useEnrollments';
+import { useSections } from '@/hooks/useSections';
 import MainLayout from '@/components/layout/MainLayout';
 import StatCard from '@/components/ui/stat-card';
 import CourseCard from '@/components/courses/CourseCard';
-import { courses, sampleEnrollments, schools, courseSections } from '@/data/sampleData';
 import { 
   BookOpen, 
   Users, 
@@ -11,27 +14,44 @@ import {
   Calendar,
   Clock,
   Award,
-  Building2
+  Building2,
+  Loader2
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { profile, user } = useAuth();
+  const { data: courses = [], isLoading: coursesLoading } = useCourses();
+  const { data: schools = [], isLoading: schoolsLoading } = useSchools();
+  const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments(user?.id);
+  const { data: sections = [] } = useSections();
 
   const enrolledCourses = courses.filter(c => 
-    sampleEnrollments.some(e => e.courseId === c.id && e.status === 'enrolled')
+    enrollments.some(e => e.course_id === c.id)
   );
 
   const totalCredits = enrolledCourses.reduce((sum, c) => sum + c.credits, 0);
 
+  const isLoading = coursesLoading || schoolsLoading || enrollmentsLoading;
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
+
   // Student Dashboard
-  if (user?.role === 'student') {
+  if (profile?.role === 'student') {
     return (
       <MainLayout>
         <div className="animate-fade-in">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">
-              Welcome back, {user.firstName}! 👋
+              Welcome back, {profile.firstName || 'Student'}! 👋
             </h1>
             <p className="text-muted-foreground mt-2">
               Here's an overview of your academic progress this semester.
@@ -62,7 +82,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Upcoming"
-              value="3"
+              value={enrolledCourses.length}
               subtitle="Classes today"
               icon={Calendar}
             />
@@ -76,34 +96,48 @@ const Dashboard = () => {
                 View All →
               </a>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {enrolledCourses.map((course, i) => (
-                <div key={course.id} className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
-                  <CourseCard course={course} isEnrolled />
-                </div>
-              ))}
-            </div>
+            {enrolledCourses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {enrolledCourses.slice(0, 3).map((course, i) => (
+                  <div key={course.id} className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
+                    <CourseCard course={course} isEnrolled />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="card-elevated p-8 text-center">
+                <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="font-semibold text-foreground mb-2">No courses yet</h3>
+                <p className="text-muted-foreground mb-4">Start by browsing available courses</p>
+                <a href="/courses" className="btn-primary inline-block">Browse Courses</a>
+              </div>
+            )}
           </div>
 
           {/* Today's Schedule */}
           <div className="card-elevated p-6">
             <h2 className="text-xl font-semibold text-foreground mb-6">Today's Schedule</h2>
-            <div className="space-y-4">
-              {[
-                { time: '09:00 - 10:00', course: 'CS101', title: 'Intro to Computer Science', room: 'CS101' },
-                { time: '11:00 - 12:00', course: 'MATH101', title: 'Calculus I', room: 'MATH101' },
-                { time: '14:00 - 15:30', course: 'BUS101', title: 'Intro to Business', room: 'BUS101' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
-                  <div className="w-24 text-sm font-medium text-primary">{item.time}</div>
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{item.title}</p>
-                    <p className="text-sm text-muted-foreground">{item.course} • Room {item.room}</p>
-                  </div>
-                  <Clock className="w-5 h-5 text-muted-foreground" />
-                </div>
-              ))}
-            </div>
+            {enrolledCourses.length > 0 ? (
+              <div className="space-y-4">
+                {enrolledCourses.slice(0, 3).map((course, i) => {
+                  const section = sections.find(s => s.course_id === course.id);
+                  return (
+                    <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                      <div className="w-24 text-sm font-medium text-primary">
+                        {section?.schedule.time || 'TBA'}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">{course.title}</p>
+                        <p className="text-sm text-muted-foreground">{course.code} • {section?.schedule.room || 'TBA'}</p>
+                      </div>
+                      <Clock className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">No classes scheduled</p>
+            )}
           </div>
         </div>
       </MainLayout>
@@ -111,13 +145,13 @@ const Dashboard = () => {
   }
 
   // Teacher Dashboard
-  if (user?.role === 'teacher') {
+  if (profile?.role === 'teacher') {
     return (
       <MainLayout>
         <div className="animate-fade-in">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">
-              Welcome, {user.firstName}! 📚
+              Welcome, {profile.firstName || 'Professor'}! 📚
             </h1>
             <p className="text-muted-foreground mt-2">
               Manage your courses and track student progress.
@@ -127,13 +161,13 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard
               title="Teaching Courses"
-              value="4"
+              value={courses.length > 4 ? 4 : courses.length}
               subtitle="This semester"
               icon={BookOpen}
             />
             <StatCard
               title="Total Students"
-              value="128"
+              value={sections.reduce((sum, s) => sum + s.enrolled, 0)}
               subtitle="Across all courses"
               icon={Users}
               variant="primary"
@@ -157,17 +191,20 @@ const Dashboard = () => {
             <div className="card-elevated p-6">
               <h2 className="text-xl font-semibold text-foreground mb-6">My Courses</h2>
               <div className="space-y-3">
-                {courses.slice(0, 4).map((course) => (
-                  <div key={course.id} className="flex items-center gap-4 p-4 rounded-lg hover:bg-secondary/30 transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-primary" />
+                {courses.slice(0, 4).map((course) => {
+                  const section = sections.find(s => s.course_id === course.id);
+                  return (
+                    <div key={course.id} className="flex items-center gap-4 p-4 rounded-lg hover:bg-secondary/30 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <BookOpen className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">{course.title}</p>
+                        <p className="text-sm text-muted-foreground">{course.code} • {section?.enrolled || 0} students</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">{course.title}</p>
-                      <p className="text-sm text-muted-foreground">{course.code} • 25 students</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -175,10 +212,10 @@ const Dashboard = () => {
               <h2 className="text-xl font-semibold text-foreground mb-6">Recent Activity</h2>
               <div className="space-y-4">
                 {[
-                  { action: 'Assignment submitted', course: 'CS101', time: '2 hours ago' },
-                  { action: 'New enrollment', course: 'CS201', time: '5 hours ago' },
-                  { action: 'Grade posted', course: 'CS101', time: '1 day ago' },
-                  { action: 'Course material updated', course: 'CS301', time: '2 days ago' },
+                  { action: 'Assignment submitted', course: courses[0]?.code || 'CS101', time: '2 hours ago' },
+                  { action: 'New enrollment', course: courses[1]?.code || 'CS201', time: '5 hours ago' },
+                  { action: 'Grade posted', course: courses[0]?.code || 'CS101', time: '1 day ago' },
+                  { action: 'Course material updated', course: courses[2]?.code || 'BUS101', time: '2 days ago' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
                     <div>
@@ -241,7 +278,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold text-foreground mb-6">Schools Overview</h2>
             <div className="space-y-4">
               {schools.map((school) => {
-                const schoolCourses = courses.filter(c => c.schoolId === school.id);
+                const schoolCourses = courses.filter(c => c.school_id === school.id);
                 return (
                   <div key={school.id} className="flex items-center gap-4 p-4 rounded-lg bg-secondary/30">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
