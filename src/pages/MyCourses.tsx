@@ -1,25 +1,41 @@
 import MainLayout from '@/components/layout/MainLayout';
-import { useAuth } from '@/contexts/AuthContext';
-import { courses, sampleEnrollments, getSectionsByCourseId, getSchoolById } from '@/data/sampleData';
-import { BookOpen, Clock, Users, MapPin, Calendar, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useCourses } from '@/hooks/useCourses';
+import { useEnrollments, useDropCourse } from '@/hooks/useEnrollments';
+import { useSections } from '@/hooks/useSections';
+import { BookOpen, Clock, Users, MapPin, Calendar, Trash2, Loader2 } from 'lucide-react';
 
 const MyCourses = () => {
-  const { user } = useAuth();
-  const [enrollments, setEnrollments] = useState(sampleEnrollments);
+  const { profile, user } = useAuth();
+  const { data: courses = [], isLoading: coursesLoading } = useCourses();
+  const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments(user?.id);
+  const { data: sections = [] } = useSections();
+  const dropMutation = useDropCourse();
 
   const enrolledCourses = courses.filter(c => 
-    enrollments.some(e => e.courseId === c.id && e.status === 'enrolled')
+    enrollments.some(e => e.course_id === c.id)
   );
 
   const totalCredits = enrolledCourses.reduce((sum, c) => sum + c.credits, 0);
 
   const handleDrop = (courseId: string) => {
-    const course = courses.find(c => c.id === courseId);
-    setEnrollments(enrollments.filter(e => e.courseId !== courseId));
-    toast.success(`Dropped ${course?.title}`);
+    const enrollment = enrollments.find(e => e.course_id === courseId);
+    if (enrollment) {
+      dropMutation.mutate(enrollment.id);
+    }
   };
+
+  const isLoading = coursesLoading || enrollmentsLoading;
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -28,7 +44,7 @@ const MyCourses = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">My Courses</h1>
           <p className="text-muted-foreground mt-2">
-            {user?.role === 'student' 
+            {profile?.role === 'student' 
               ? 'View and manage your current course enrollments.'
               : 'View your assigned courses and student enrollment.'}
           </p>
@@ -76,9 +92,8 @@ const MyCourses = () => {
         {/* Course List */}
         <div className="space-y-4">
           {enrolledCourses.map((course, i) => {
-            const sections = getSectionsByCourseId(course.id);
-            const section = sections[0];
-            const school = getSchoolById(course.schoolId);
+            const section = sections.find(s => s.course_id === course.id);
+            const school = course.schools;
 
             return (
               <div 
@@ -120,18 +135,19 @@ const MyCourses = () => {
                         </div>
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <MapPin className="w-4 h-4" />
-                          <span>Room {section.schedule.room}</span>
+                          <span>{section.schedule.room}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
                   {/* Actions */}
-                  {user?.role === 'student' && (
+                  {profile?.role === 'student' && (
                     <div className="flex lg:flex-col gap-2">
                       <button
                         onClick={() => handleDrop(course.id)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors text-sm font-medium"
+                        disabled={dropMutation.isPending}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors text-sm font-medium disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                         Drop Course

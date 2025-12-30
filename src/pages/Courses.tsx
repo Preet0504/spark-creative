@@ -1,42 +1,74 @@
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import CourseCard from '@/components/courses/CourseCard';
-import { courses, schools, sampleEnrollments } from '@/data/sampleData';
-import { Search, Filter, ChevronDown } from 'lucide-react';
+import { useCourses } from '@/hooks/useCourses';
+import { useSchools } from '@/hooks/useSchools';
+import { useEnrollments, useEnroll } from '@/hooks/useEnrollments';
+import { useSections } from '@/hooks/useSections';
+import { useAuth } from '@/hooks/useAuth';
+import { Search, Filter, ChevronDown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
 
 const Courses = () => {
-  const { user } = useAuth();
+  const { profile, user } = useAuth();
+  const { data: courses = [], isLoading: coursesLoading } = useCourses();
+  const { data: schools = [] } = useSchools();
+  const { data: enrollments = [] } = useEnrollments(user?.id);
+  const { data: sections = [] } = useSections();
+  const enrollMutation = useEnroll();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSchool, setSelectedSchool] = useState('all');
   const [selectedSemester, setSelectedSemester] = useState('all');
-  const [enrolledCourses, setEnrolledCourses] = useState<string[]>(
-    sampleEnrollments.filter(e => e.status === 'enrolled').map(e => e.courseId)
-  );
+
+  const enrolledCourseIds = enrollments.map(e => e.course_id);
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = 
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (course.description?.toLowerCase() || '').includes(searchQuery.toLowerCase());
     
-    const matchesSchool = selectedSchool === 'all' || course.schoolId === selectedSchool;
+    const matchesSchool = selectedSchool === 'all' || course.school_id === selectedSchool;
     const matchesSemester = selectedSemester === 'all' || course.semester === selectedSemester;
     
     return matchesSearch && matchesSchool && matchesSemester;
   });
 
   const handleEnroll = (courseId: string) => {
-    if (enrolledCourses.includes(courseId)) {
+    if (!user?.id) {
+      toast.error('You must be logged in to enroll');
+      return;
+    }
+
+    if (enrolledCourseIds.includes(courseId)) {
       toast.error('You are already enrolled in this course');
       return;
     }
-    
-    setEnrolledCourses([...enrolledCourses, courseId]);
-    const course = courses.find(c => c.id === courseId);
-    toast.success(`Successfully enrolled in ${course?.title}!`);
+
+    // Get the first available section for this course
+    const section = sections.find(s => s.course_id === courseId);
+    if (!section) {
+      toast.error('No available sections for this course');
+      return;
+    }
+
+    enrollMutation.mutate({
+      courseId,
+      sectionId: section.id,
+      studentId: user.id,
+    });
   };
+
+  if (coursesLoading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -104,7 +136,7 @@ const Courses = () => {
           </p>
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Enrolled:</span>
-            <span className="font-semibold text-primary">{enrolledCourses.length}</span>
+            <span className="font-semibold text-primary">{enrolledCourseIds.length}</span>
           </div>
         </div>
 
@@ -118,8 +150,8 @@ const Courses = () => {
             >
               <CourseCard
                 course={course}
-                isEnrolled={enrolledCourses.includes(course.id)}
-                onEnroll={user?.role === 'student' ? handleEnroll : undefined}
+                isEnrolled={enrolledCourseIds.includes(course.id)}
+                onEnroll={profile?.role === 'student' ? handleEnroll : undefined}
               />
             </div>
           ))}

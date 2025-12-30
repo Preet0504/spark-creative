@@ -14,16 +14,222 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      course_sections: {
+        Row: {
+          course_id: string
+          created_at: string
+          enrolled: number
+          id: string
+          instructor: string
+          schedule: Json
+          section: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          enrolled?: number
+          id?: string
+          instructor: string
+          schedule?: Json
+          section: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          enrolled?: number
+          id?: string
+          instructor?: string
+          schedule?: Json
+          section?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_sections_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          code: string
+          created_at: string
+          credits: number
+          description: string | null
+          id: string
+          max_students: number
+          prerequisites: string[] | null
+          school_id: string | null
+          semester: Database["public"]["Enums"]["semester_type"]
+          title: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          credits?: number
+          description?: string | null
+          id?: string
+          max_students?: number
+          prerequisites?: string[] | null
+          school_id?: string | null
+          semester?: Database["public"]["Enums"]["semester_type"]
+          title: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          credits?: number
+          description?: string | null
+          id?: string
+          max_students?: number
+          prerequisites?: string[] | null
+          school_id?: string | null
+          semester?: Database["public"]["Enums"]["semester_type"]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enrollments: {
+        Row: {
+          course_id: string
+          enrolled_at: string
+          grade: string | null
+          id: string
+          section_id: string
+          status: Database["public"]["Enums"]["enrollment_status"]
+          student_id: string
+        }
+        Insert: {
+          course_id: string
+          enrolled_at?: string
+          grade?: string | null
+          id?: string
+          section_id: string
+          status?: Database["public"]["Enums"]["enrollment_status"]
+          student_id: string
+        }
+        Update: {
+          course_id?: string
+          enrolled_at?: string
+          grade?: string | null
+          id?: string
+          section_id?: string
+          status?: Database["public"]["Enums"]["enrollment_status"]
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "course_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          profile_picture: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          profile_picture?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          profile_picture?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      schools: {
+        Row: {
+          created_at: string
+          dean: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          dean: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          dean?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "teacher" | "admin"
+      enrollment_status: "enrolled" | "pending" | "dropped"
+      semester_type: "fall" | "spring" | "summer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +356,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "teacher", "admin"],
+      enrollment_status: ["enrolled", "pending", "dropped"],
+      semester_type: ["fall", "spring", "summer"],
+    },
   },
 } as const

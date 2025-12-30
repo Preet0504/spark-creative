@@ -1,19 +1,20 @@
-import { Course, CourseSection } from '@/types';
-import { getSchoolById, getSectionsByCourseId } from '@/data/sampleData';
+import { Database } from '@/integrations/supabase/types';
 import { Clock, Users, BookOpen, ChevronRight } from 'lucide-react';
 
+type Course = Database['public']['Tables']['courses']['Row'];
+type School = Database['public']['Tables']['schools']['Row'];
+
+interface CourseWithSchool extends Course {
+  schools: School | null;
+}
+
 interface CourseCardProps {
-  course: Course;
+  course: CourseWithSchool;
   onEnroll?: (courseId: string) => void;
   isEnrolled?: boolean;
 }
 
 const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
-  const school = getSchoolById(course.schoolId);
-  const sections = getSectionsByCourseId(course.id);
-  const totalEnrolled = sections.reduce((sum, s) => sum + s.enrolled, 0);
-  const availableSpots = (course.maxStudents * sections.length) - totalEnrolled;
-
   const semesterColors = {
     fall: 'badge-teal',
     spring: 'badge-success',
@@ -35,7 +36,7 @@ const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
             <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
               {course.title}
             </h3>
-            <p className="text-sm text-muted-foreground mt-1">{school?.name}</p>
+            <p className="text-sm text-muted-foreground mt-1">{course.schools?.name}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
             <BookOpen className="w-6 h-6 text-primary" />
@@ -56,11 +57,11 @@ const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
           </div>
           <div className="flex items-center gap-1.5">
             <Users className="w-4 h-4" />
-            <span>{availableSpots} spots left</span>
+            <span>{course.max_students} max</span>
           </div>
         </div>
 
-        {course.prerequisites.length > 0 && (
+        {course.prerequisites && course.prerequisites.length > 0 && (
           <p className="text-xs text-muted-foreground mb-4">
             Prerequisites: {course.prerequisites.length} course(s) required
           </p>
