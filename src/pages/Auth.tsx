@@ -66,6 +66,7 @@ const Auth = () => {
           }
         } else {
           toast.success('Welcome back!');
+          navigate('/dashboard', { replace: true });
         }
       } else {
         const result = signupSchema.safeParse(formData);
@@ -95,6 +96,7 @@ const Auth = () => {
           }
         } else {
           toast.success('Account created successfully!');
+          navigate('/dashboard', { replace: true });
         }
       }
     } catch (err) {
