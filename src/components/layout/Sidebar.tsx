@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const { user, logout } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const location = useLocation();
 
   const studentLinks = [
@@ -43,8 +43,8 @@ const Sidebar = () => {
     { to: '/settings', icon: Settings, label: 'Settings' },
   ];
 
-  const links = user?.role === 'student' ? studentLinks 
-    : user?.role === 'teacher' ? teacherLinks 
+  const links = profile?.role === 'student' ? studentLinks 
+    : profile?.role === 'teacher' ? teacherLinks 
     : adminLinks;
 
   return (
@@ -86,12 +86,12 @@ const Sidebar = () => {
         <div className="flex items-center gap-3 mb-4 px-2">
           <div className="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center">
             <span className="text-sidebar-foreground font-semibold text-sm">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+              {profile?.firstName?.[0]}{profile?.lastName?.[0]}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-sidebar-foreground truncate">
-              {user?.firstName} {user?.lastName}
+              {profile?.firstName} {profile?.lastName}
             </p>
             <p className="text-xs text-sidebar-foreground/60 truncate">
               {user?.email}
@@ -99,7 +99,7 @@ const Sidebar = () => {
           </div>
         </div>
         <button
-          onClick={logout}
+          onClick={signOut}
           className="sidebar-link w-full text-sidebar-foreground/80 hover:text-sidebar-foreground"
         >
           <LogOut className="w-5 h-5" />
