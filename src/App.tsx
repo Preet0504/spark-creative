@@ -9,6 +9,9 @@ import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 import MyCourses from "./pages/MyCourses";
 import Schedule from "./pages/Schedule";
+import Schools from "./pages/Schools";
+import Users from "./pages/Users";
+import CoursesAdmin from "./pages/CoursesAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,12 +57,17 @@ const App = () => (
           } />
           <Route path="/schools" element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <Dashboard />
+              <Schools />
             </ProtectedRoute>
           } />
           <Route path="/users" element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <Dashboard />
+              <Users />
+            </ProtectedRoute>
+          } />
+          <Route path="/courses-admin" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <CoursesAdmin />
             </ProtectedRoute>
           } />
           <Route path="/settings" element={
