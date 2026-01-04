@@ -12,6 +12,8 @@ import Schedule from "./pages/Schedule";
 import Schools from "./pages/Schools";
 import Users from "./pages/Users";
 import CoursesAdmin from "./pages/CoursesAdmin";
+import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,7 +54,7 @@ const App = () => (
           } />
           <Route path="/analytics" element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <Dashboard />
+              <Analytics />
             </ProtectedRoute>
           } />
           <Route path="/schools" element={
@@ -72,7 +74,7 @@ const App = () => (
           } />
           <Route path="/settings" element={
             <ProtectedRoute>
-              <Dashboard />
+              <Settings />
             </ProtectedRoute>
           } />
           <Route path="/chat" element={
