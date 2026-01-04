@@ -5,6 +5,7 @@ import { z } from 'zod';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -16,9 +17,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useUsersByRole } from '@/hooks/useUsers';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
@@ -54,6 +63,8 @@ export function SectionFormDialog({
   isLoading,
   courseTitle,
 }: SectionFormDialogProps) {
+  const { data: teachers } = useUsersByRole('teacher');
+  
   const form = useForm<SectionFormValues>({
     resolver: zodResolver(sectionSchema),
     defaultValues: {
@@ -105,6 +116,9 @@ export function SectionFormDialog({
             {initialData ? 'Edit Section' : 'Add Section'}
             {courseTitle && <span className="text-muted-foreground font-normal"> - {courseTitle}</span>}
           </DialogTitle>
+          <DialogDescription>
+            {initialData ? 'Update section details' : 'Create a new section and assign an instructor'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -128,9 +142,22 @@ export function SectionFormDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Instructor</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Dr. Smith" {...field} />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a teacher..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {teachers?.map((teacher) => (
+                          <SelectItem key={teacher.id} value={`${teacher.firstName || ''} ${teacher.lastName || ''}`.trim() || teacher.id}>
+                            {teacher.firstName || teacher.lastName 
+                              ? `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim()
+                              : `Teacher (${teacher.id.slice(0, 8)})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
