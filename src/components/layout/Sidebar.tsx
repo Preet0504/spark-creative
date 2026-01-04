@@ -36,7 +36,7 @@ const Sidebar = () => {
 
   const adminLinks = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/courses', icon: BookOpen, label: 'Courses' },
+    { to: '/courses-admin', icon: BookOpen, label: 'Courses' },
     { to: '/schools', icon: Building2, label: 'Schools' },
     { to: '/users', icon: Users, label: 'Users' },
     { to: '/analytics', icon: BarChart3, label: 'Analytics' },
