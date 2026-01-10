@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import CourseCard from '@/components/courses/CourseCard';
+import SectionSelectDialog from '@/components/enrollment/SectionSelectDialog';
 import { useCourses } from '@/hooks/useCourses';
 import { useSchools } from '@/hooks/useSchools';
 import { useEnrollments, useEnroll } from '@/hooks/useEnrollments';
@@ -20,6 +21,13 @@ const Courses = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSchool, setSelectedSchool] = useState('all');
   const [selectedSemester, setSelectedSemester] = useState('all');
+  
+  // Section selection dialog state
+  const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
+  const [selectedCourseForEnroll, setSelectedCourseForEnroll] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
 
   const enrolledCourseIds = enrollments.map(e => e.course_id);
 
@@ -35,7 +43,7 @@ const Courses = () => {
     return matchesSearch && matchesSchool && matchesSemester;
   });
 
-  const handleEnroll = (courseId: string) => {
+  const handleEnrollClick = (courseId: string) => {
     if (!user?.id) {
       toast.error('You must be logged in to enroll');
       return;
@@ -46,18 +54,44 @@ const Courses = () => {
       return;
     }
 
-    // Get the first available section for this course
-    const section = sections.find(s => s.course_id === courseId);
-    if (!section) {
-      toast.error('No available sections for this course');
-      return;
-    }
+    const course = courses.find(c => c.id === courseId);
+    const courseSections = sections.filter(s => s.course_id === courseId);
 
-    enrollMutation.mutate({
-      courseId,
-      sectionId: section.id,
-      studentId: user.id,
-    });
+    // If only one section, enroll directly
+    if (courseSections.length === 1) {
+      enrollMutation.mutate({
+        courseId,
+        sectionId: courseSections[0].id,
+        studentId: user.id,
+      });
+    } else if (courseSections.length > 1) {
+      // Multiple sections, show selection dialog
+      setSelectedCourseForEnroll({
+        id: courseId,
+        title: course?.title || 'Unknown Course',
+      });
+      setSectionDialogOpen(true);
+    } else {
+      toast.error('No available sections for this course');
+    }
+  };
+
+  const handleSectionSelect = (sectionId: string) => {
+    if (!user?.id || !selectedCourseForEnroll) return;
+
+    enrollMutation.mutate(
+      {
+        courseId: selectedCourseForEnroll.id,
+        sectionId,
+        studentId: user.id,
+      },
+      {
+        onSuccess: () => {
+          setSectionDialogOpen(false);
+          setSelectedCourseForEnroll(null);
+        },
+      }
+    );
   };
 
   if (coursesLoading) {
@@ -151,7 +185,7 @@ const Courses = () => {
               <CourseCard
                 course={course}
                 isEnrolled={enrolledCourseIds.includes(course.id)}
-                onEnroll={profile?.role === 'student' ? handleEnroll : undefined}
+                onEnroll={profile?.role === 'student' ? handleEnrollClick : undefined}
               />
             </div>
           ))}
@@ -170,6 +204,21 @@ const Courses = () => {
           </div>
         )}
       </div>
+
+      {/* Section Selection Dialog */}
+      {selectedCourseForEnroll && (
+        <SectionSelectDialog
+          open={sectionDialogOpen}
+          onOpenChange={(open) => {
+            setSectionDialogOpen(open);
+            if (!open) setSelectedCourseForEnroll(null);
+          }}
+          courseId={selectedCourseForEnroll.id}
+          courseName={selectedCourseForEnroll.title}
+          onSelectSection={handleSectionSelect}
+          isEnrolling={enrollMutation.isPending}
+        />
+      )}
     </MainLayout>
   );
 };
