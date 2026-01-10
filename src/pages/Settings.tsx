@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +18,23 @@ export default function Settings() {
   const [lastName, setLastName] = useState(profile?.lastName || '');
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   const handleUpdateProfile = async () => {
     if (!user) return;
@@ -185,9 +202,7 @@ export default function Settings() {
                 <p className="font-medium">Dark Mode</p>
                 <p className="text-sm text-muted-foreground">Toggle dark mode theme</p>
               </div>
-              <Button variant="outline" disabled>
-                Coming Soon
-              </Button>
+              <Switch checked={isDarkMode} onCheckedChange={setIsDarkMode} />
             </div>
           </CardContent>
         </Card>

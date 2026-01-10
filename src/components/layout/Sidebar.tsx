@@ -29,9 +29,9 @@ const Sidebar = () => {
   const teacherLinks = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/my-courses', icon: BookOpen, label: 'My Courses' },
+    { to: '/grading', icon: ClipboardList, label: 'Grading' },
     { to: '/students', icon: Users, label: 'Students' },
     { to: '/schedule', icon: Calendar, label: 'Schedule' },
-    { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   ];
 
   const adminLinks = [
@@ -39,6 +39,8 @@ const Sidebar = () => {
     { to: '/courses-admin', icon: BookOpen, label: 'Courses' },
     { to: '/schools', icon: Building2, label: 'Schools' },
     { to: '/users', icon: Users, label: 'Users' },
+    { to: '/grading', icon: ClipboardList, label: 'Grading' },
+    { to: '/announcements', icon: MessageSquare, label: 'Announcements' },
     { to: '/analytics', icon: BarChart3, label: 'Analytics' },
     { to: '/settings', icon: Settings, label: 'Settings' },
   ];
