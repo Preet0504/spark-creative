@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import { User, Bell, Shield, Palette, Loader2 } from 'lucide-react';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 export default function Settings() {
   const { user, profile } = useAuth();
@@ -94,7 +95,9 @@ export default function Settings() {
             </CardTitle>
             <CardDescription>Update your personal information</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            <AvatarUpload />
+            <Separator />
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>

@@ -1,4 +1,9 @@
+import { useState } from 'react';
 import { useSectionsByCourse } from '@/hooks/useSections';
+import { useCourses } from '@/hooks/useCourses';
+import { usePrerequisiteCheck } from '@/hooks/usePrerequisites';
+import { useStudentWaitlist, useWaitlistMutations, useWaitlistBySection } from '@/hooks/useWaitlist';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +11,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, MapPin, Users, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Calendar, Clock, MapPin, Users, User, AlertTriangle, Clock3 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface SectionSelectDialogProps {
   open: boolean;
@@ -25,7 +33,43 @@ const SectionSelectDialog = ({
   onSelectSection,
   isEnrolling,
 }: SectionSelectDialogProps) => {
+  const { user } = useAuth();
   const { data: sections = [], isLoading } = useSectionsByCourse(courseId);
+  const { data: courses = [] } = useCourses();
+  const { canEnroll, missingPrerequisites } = usePrerequisiteCheck(courseId, user?.id);
+  const { data: studentWaitlist = [] } = useStudentWaitlist(user?.id);
+  const { joinWaitlist } = useWaitlistMutations();
+  const [joiningWaitlist, setJoiningWaitlist] = useState<string | null>(null);
+
+  const course = courses.find(c => c.id === courseId);
+  const maxStudents = course?.max_students || 30;
+
+  const handleJoinWaitlist = async (sectionId: string) => {
+    if (!user) return;
+    setJoiningWaitlist(sectionId);
+    try {
+      await joinWaitlist.mutateAsync({
+        studentId: user.id,
+        sectionId,
+        courseId,
+      });
+      toast({
+        title: 'Added to waitlist',
+        description: 'You will be notified when a spot becomes available.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Failed to join waitlist',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setJoiningWaitlist(null);
+    }
+  };
+
+  const isOnWaitlist = (sectionId: string) => 
+    studentWaitlist.some(w => w.section_id === sectionId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -34,6 +78,24 @@ const SectionSelectDialog = ({
           <DialogTitle>Select a Section</DialogTitle>
           <p className="text-sm text-muted-foreground">{courseName}</p>
         </DialogHeader>
+
+        {/* Prerequisites Warning */}
+        {!canEnroll && missingPrerequisites.length > 0 && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Prerequisites Required</AlertTitle>
+            <AlertDescription>
+              You must complete the following courses before enrolling:
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {missingPrerequisites.map(prereq => (
+                  <Badge key={prereq} variant="outline" className="bg-destructive/10">
+                    {prereq}
+                  </Badge>
+                ))}
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {isLoading ? (
           <div className="py-8 text-center text-muted-foreground">Loading sections...</div>
@@ -44,15 +106,18 @@ const SectionSelectDialog = ({
         ) : (
           <div className="space-y-3 max-h-[400px] overflow-y-auto">
             {sections.map(section => {
-              const isFull = section.enrolled >= 30; // Assuming max 30 per section
+              const isFull = section.enrolled >= maxStudents;
+              const onWaitlist = isOnWaitlist(section.id);
 
               return (
                 <div
                   key={section.id}
                   className={`p-4 rounded-lg border transition-colors ${
-                    isFull
+                    !canEnroll
                       ? 'bg-muted/50 border-border cursor-not-allowed opacity-60'
-                      : 'bg-card border-border hover:border-primary cursor-pointer'
+                      : isFull
+                        ? 'bg-muted/30 border-border'
+                        : 'bg-card border-border hover:border-primary'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -60,9 +125,15 @@ const SectionSelectDialog = ({
                       <div className="flex items-center gap-2 mb-2">
                         <span className="font-semibold text-foreground">Section {section.section}</span>
                         {isFull && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-destructive/10 text-destructive">
+                          <Badge variant="destructive" className="text-xs">
                             Full
-                          </span>
+                          </Badge>
+                        )}
+                        {onWaitlist && (
+                          <Badge variant="secondary" className="text-xs">
+                            <Clock3 className="w-3 h-3 mr-1" />
+                            On Waitlist
+                          </Badge>
                         )}
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
@@ -72,7 +143,7 @@ const SectionSelectDialog = ({
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
-                          <span>{section.enrolled}/30 enrolled</span>
+                          <span>{section.enrolled}/{maxStudents} enrolled</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
@@ -88,13 +159,30 @@ const SectionSelectDialog = ({
                         </div>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => onSelectSection(section.id)}
-                      disabled={isFull || isEnrolling}
-                      size="sm"
-                    >
-                      {isEnrolling ? 'Enrolling...' : 'Enroll'}
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      {!isFull ? (
+                        <Button
+                          onClick={() => onSelectSection(section.id)}
+                          disabled={!canEnroll || isEnrolling}
+                          size="sm"
+                        >
+                          {isEnrolling ? 'Enrolling...' : 'Enroll'}
+                        </Button>
+                      ) : !onWaitlist ? (
+                        <Button
+                          onClick={() => handleJoinWaitlist(section.id)}
+                          disabled={!canEnroll || joiningWaitlist === section.id}
+                          variant="outline"
+                          size="sm"
+                        >
+                          {joiningWaitlist === section.id ? 'Joining...' : 'Join Waitlist'}
+                        </Button>
+                      ) : (
+                        <Button variant="ghost" size="sm" disabled>
+                          On Waitlist
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

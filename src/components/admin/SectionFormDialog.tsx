@@ -33,7 +33,7 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
 const sectionSchema = z.object({
   section: z.string().min(1, 'Section name is required').max(20),
-  instructor: z.string().min(1, 'Instructor is required').max(100),
+  instructorId: z.string().min(1, 'Instructor is required'),
   days: z.array(z.string()).min(1, 'Select at least one day'),
   time: z.string().min(1, 'Time is required'),
   room: z.string().min(1, 'Room is required').max(50),
@@ -44,11 +44,17 @@ type SectionFormValues = z.infer<typeof sectionSchema>;
 interface SectionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { section: string; instructor: string; schedule: { days: string[]; time: string; room: string } }) => void;
+  onSubmit: (data: { 
+    section: string; 
+    instructor: string; 
+    instructor_id: string;
+    schedule: { days: string[]; time: string; room: string } 
+  }) => void;
   initialData?: {
     id: string;
     section: string;
     instructor: string;
+    instructor_id?: string;
     schedule: { days: string[]; time: string; room: string };
   } | null;
   isLoading?: boolean;
@@ -63,13 +69,13 @@ export function SectionFormDialog({
   isLoading,
   courseTitle,
 }: SectionFormDialogProps) {
-  const { data: teachers } = useUsersByRole('teacher');
+  const { data: teachers = [] } = useUsersByRole('teacher');
   
   const form = useForm<SectionFormValues>({
     resolver: zodResolver(sectionSchema),
     defaultValues: {
       section: '',
-      instructor: '',
+      instructorId: '',
       days: [],
       time: '',
       room: '',
@@ -78,9 +84,22 @@ export function SectionFormDialog({
 
   useEffect(() => {
     if (initialData) {
+      // Try to find the teacher by name if instructor_id is not set
+      let instructorId = initialData.instructor_id || '';
+      if (!instructorId && initialData.instructor) {
+        const matchingTeacher = teachers.find(t => {
+          const fullName = `${t.firstName || ''} ${t.lastName || ''}`.trim();
+          return fullName.toLowerCase() === initialData.instructor.toLowerCase() ||
+                 initialData.instructor.toLowerCase().includes((t.lastName || '').toLowerCase());
+        });
+        if (matchingTeacher) {
+          instructorId = matchingTeacher.id;
+        }
+      }
+      
       form.reset({
         section: initialData.section,
-        instructor: initialData.instructor,
+        instructorId,
         days: initialData.schedule.days,
         time: initialData.schedule.time,
         room: initialData.schedule.room,
@@ -88,18 +107,24 @@ export function SectionFormDialog({
     } else {
       form.reset({
         section: '',
-        instructor: '',
+        instructorId: '',
         days: [],
         time: '',
         room: '',
       });
     }
-  }, [initialData, form]);
+  }, [initialData, form, teachers]);
 
   const handleSubmit = (data: SectionFormValues) => {
+    const selectedTeacher = teachers.find(t => t.id === data.instructorId);
+    const instructorName = selectedTeacher 
+      ? `${selectedTeacher.firstName || ''} ${selectedTeacher.lastName || ''}`.trim()
+      : 'Unknown';
+
     onSubmit({
       section: data.section,
-      instructor: data.instructor,
+      instructor: instructorName,
+      instructor_id: data.instructorId,
       schedule: {
         days: data.days,
         time: data.time,
@@ -138,7 +163,7 @@ export function SectionFormDialog({
               />
               <FormField
                 control={form.control}
-                name="instructor"
+                name="instructorId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Instructor</FormLabel>
@@ -149,8 +174,8 @@ export function SectionFormDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {teachers?.map((teacher) => (
-                          <SelectItem key={teacher.id} value={`${teacher.firstName || ''} ${teacher.lastName || ''}`.trim() || teacher.id}>
+                        {teachers.map((teacher) => (
+                          <SelectItem key={teacher.id} value={teacher.id}>
                             {teacher.firstName || teacher.lastName 
                               ? `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim()
                               : `Teacher (${teacher.id.slice(0, 8)})`}

@@ -22,6 +22,7 @@ const Sidebar = () => {
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/courses', icon: BookOpen, label: 'Course Catalog' },
     { to: '/my-courses', icon: ClipboardList, label: 'My Courses' },
+    { to: '/grades', icon: BarChart3, label: 'Grades' },
     { to: '/schedule', icon: Calendar, label: 'Schedule' },
     { to: '/chat', icon: MessageSquare, label: 'AI Assistant' },
   ];

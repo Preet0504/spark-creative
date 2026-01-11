@@ -57,6 +57,7 @@ export type Database = {
           enrolled: number
           id: string
           instructor: string
+          instructor_id: string | null
           schedule: Json
           section: string
         }
@@ -66,6 +67,7 @@ export type Database = {
           enrolled?: number
           id?: string
           instructor: string
+          instructor_id?: string | null
           schedule?: Json
           section: string
         }
@@ -75,6 +77,7 @@ export type Database = {
           enrolled?: number
           id?: string
           instructor?: string
+          instructor_id?: string | null
           schedule?: Json
           section?: string
         }
@@ -84,6 +87,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_sections_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -248,6 +258,48 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      waitlist: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          position: number
+          section_id: string
+          student_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          position: number
+          section_id: string
+          student_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          section_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waitlist_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "course_sections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
