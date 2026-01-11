@@ -355,7 +355,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold text-foreground mb-6">Quick Actions</h2>
             <div className="space-y-3">
               <button
-                onClick={() => navigate('/courses')}
+                onClick={() => navigate('/courses-admin')}
                 className="w-full flex items-center gap-3 p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors text-left"
               >
                 <BookOpen className="w-5 h-5 text-primary" />
