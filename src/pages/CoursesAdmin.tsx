@@ -157,6 +157,7 @@ export default function CoursesAdmin() {
   const handleSectionSubmit = (data: {
     section: string;
     instructor: string;
+    instructor_id?: string;
     schedule: { days: string[]; time: string; room: string };
   }) => {
     if (selectedSection) {

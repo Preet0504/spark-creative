@@ -15,6 +15,7 @@ import CoursesAdmin from "./pages/CoursesAdmin";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Grading from "./pages/Grading";
+import Grades from "./pages/Grades";
 import Announcements from "./pages/Announcements";
 import NotFound from "./pages/NotFound";
 
@@ -47,6 +48,11 @@ const App = () => (
           <Route path="/schedule" element={
             <ProtectedRoute>
               <Schedule />
+            </ProtectedRoute>
+          } />
+          <Route path="/grades" element={
+            <ProtectedRoute>
+              <Grades />
             </ProtectedRoute>
           } />
           <Route path="/students" element={

@@ -13,6 +13,7 @@ interface CreateSectionData {
   course_id: string;
   section: string;
   instructor: string;
+  instructor_id?: string;
   schedule: SectionSchedule;
   enrolled?: number;
 }
@@ -32,6 +33,7 @@ export function useCreateSection() {
           course_id: data.course_id,
           section: data.section,
           instructor: data.instructor,
+          instructor_id: data.instructor_id,
           schedule: data.schedule as unknown as Json,
           enrolled: data.enrolled,
         })
