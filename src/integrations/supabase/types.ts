@@ -261,6 +261,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_instructor_for_section: {
+        Args: { _section_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "student" | "teacher" | "admin"
