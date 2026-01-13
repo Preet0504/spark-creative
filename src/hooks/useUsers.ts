@@ -82,3 +82,6 @@ export function useAllUsersWithRoles() {
     },
   });
 }
+
+// Alias for backwards compatibility
+export const useUsers = useAllUsersWithRoles;

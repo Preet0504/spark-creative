@@ -15,6 +15,7 @@ import CoursesAdmin from "./pages/CoursesAdmin";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Grading from "./pages/Grading";
+import Assignments from "./pages/Assignments";
 import Grades from "./pages/Grades";
 import Announcements from "./pages/Announcements";
 import NotFound from "./pages/NotFound";
@@ -93,6 +94,11 @@ const App = () => (
           <Route path="/announcements" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <Announcements />
+            </ProtectedRoute>
+          } />
+          <Route path="/assignments" element={
+            <ProtectedRoute>
+              <Assignments />
             </ProtectedRoute>
           } />
           <Route path="/chat" element={
