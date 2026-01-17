@@ -18,6 +18,7 @@ import Grading from "./pages/Grading";
 import Assignments from "./pages/Assignments";
 import Grades from "./pages/Grades";
 import Announcements from "./pages/Announcements";
+import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -103,7 +104,7 @@ const App = () => (
           } />
           <Route path="/chat" element={
             <ProtectedRoute>
-              <Dashboard />
+              <Chat />
             </ProtectedRoute>
           } />
           <Route path="*" element={<NotFound />} />
