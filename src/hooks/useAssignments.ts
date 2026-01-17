@@ -2,6 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export const getSignedUrl = async (filePath: string): Promise<string | null> => {
+  const { data, error } = await supabase.storage
+    .from('submissions')
+    .createSignedUrl(filePath, 3600); // 1 hour expiry
+  
+  if (error) {
+    console.error('Error getting signed URL:', error);
+    return null;
+  }
+  return data.signedUrl;
+};
+
 export interface Assignment {
   id: string;
   section_id: string;
@@ -231,9 +243,8 @@ export const useSubmitAssignment = () => {
       
       if (uploadError) throw uploadError;
       
-      const { data: urlData } = supabase.storage
-        .from('submissions')
-        .getPublicUrl(filePath);
+      // Store the file path (not public URL since bucket is private)
+      // We'll generate signed URLs when displaying
       
       // Create or update submission
       const { data, error } = await supabase
@@ -241,7 +252,7 @@ export const useSubmitAssignment = () => {
         .upsert({
           assignment_id: assignmentId,
           student_id: studentId,
-          file_url: urlData.publicUrl,
+          file_url: filePath,
           file_name: file.name,
           submitted_at: new Date().toISOString(),
         }, { onConflict: 'assignment_id,student_id' })

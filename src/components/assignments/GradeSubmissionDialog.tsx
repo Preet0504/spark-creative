@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ExternalLink } from 'lucide-react';
-import { useGradeSubmission, AssignmentSubmission, Assignment } from '@/hooks/useAssignments';
+import { ExternalLink, Loader2 } from 'lucide-react';
+import { useGradeSubmission, AssignmentSubmission, Assignment, getSignedUrl } from '@/hooks/useAssignments';
 
 interface GradeSubmissionDialogProps {
   open: boolean;
@@ -31,8 +31,29 @@ const GradeSubmissionDialog = ({
 }: GradeSubmissionDialogProps) => {
   const [grade, setGrade] = useState(submission?.grade?.toString() || '');
   const [feedback, setFeedback] = useState(submission?.feedback || '');
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  const [loadingUrl, setLoadingUrl] = useState(false);
   
   const gradeMutation = useGradeSubmission();
+
+  useEffect(() => {
+    const fetchSignedUrl = async () => {
+      if (submission?.file_url && open) {
+        setLoadingUrl(true);
+        const url = await getSignedUrl(submission.file_url);
+        setSignedUrl(url);
+        setLoadingUrl(false);
+      }
+    };
+    fetchSignedUrl();
+  }, [submission?.file_url, open]);
+
+  useEffect(() => {
+    if (submission) {
+      setGrade(submission.grade?.toString() || '');
+      setFeedback(submission.feedback || '');
+    }
+  }, [submission]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,15 +94,24 @@ const GradeSubmissionDialog = ({
 
           {submission.file_url && (
             <div className="p-3 bg-muted rounded-lg">
-              <a 
-                href={submission.file_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-primary hover:underline"
-              >
-                <ExternalLink className="h-4 w-4" />
-                View Submission: {submission.file_name}
-              </a>
+              {loadingUrl ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading file link...
+                </div>
+              ) : signedUrl ? (
+                <a 
+                  href={signedUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Submission: {submission.file_name}
+                </a>
+              ) : (
+                <span className="text-sm text-muted-foreground">File: {submission.file_name}</span>
+              )}
             </div>
           )}
 

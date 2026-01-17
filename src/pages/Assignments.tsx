@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useSections } from '@/hooks/useSections';
@@ -10,6 +10,7 @@ import {
   useSubmissions,
   Assignment,
   AssignmentSubmission,
+  getSignedUrl,
 } from '@/hooks/useAssignments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,12 +23,44 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FileText, Clock, CheckCircle, Upload } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, Upload, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import CreateAssignmentDialog from '@/components/assignments/CreateAssignmentDialog';
 import SubmissionDialog from '@/components/assignments/SubmissionDialog';
 import GradeSubmissionDialog from '@/components/assignments/GradeSubmissionDialog';
-import { Loader2 } from 'lucide-react';
+
+// Component to display file link with signed URL
+const SubmissionFileLink = ({ filePath, fileName }: { filePath: string | null; fileName: string | null }) => {
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUrl = async () => {
+      if (filePath) {
+        setLoading(true);
+        const url = await getSignedUrl(filePath);
+        setSignedUrl(url);
+        setLoading(false);
+      }
+    };
+    fetchUrl();
+  }, [filePath]);
+
+  if (!filePath) return <span className="text-muted-foreground">No file</span>;
+  if (loading) return <Loader2 className="h-4 w-4 animate-spin" />;
+  if (!signedUrl) return <span className="text-muted-foreground">{fileName}</span>;
+
+  return (
+    <a 
+      href={signedUrl} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-primary hover:underline"
+    >
+      {fileName}
+    </a>
+  );
+};
 
 const Assignments = () => {
   const { user, profile } = useAuth();
@@ -252,18 +285,7 @@ const Assignments = () => {
                           {getStudentName(submission.student_id)}
                         </TableCell>
                         <TableCell>
-                          {submission.file_url ? (
-                            <a 
-                              href={submission.file_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              {submission.file_name}
-                            </a>
-                          ) : (
-                            'No file'
-                          )}
+                          <SubmissionFileLink filePath={submission.file_url} fileName={submission.file_name} />
                         </TableCell>
                         <TableCell>
                           {format(new Date(submission.submitted_at), 'PPp')}
