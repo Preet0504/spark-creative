@@ -191,7 +191,7 @@ const Auth = () => {
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                       className="input-field pl-12"
-                      placeholder="John"
+                      placeholder=""
                     />
                   </div>
                   {errors.firstName && (
@@ -209,7 +209,7 @@ const Auth = () => {
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                       className="input-field pl-12"
-                      placeholder="Doe"
+                      placeholder=""
                     />
                   </div>
                   {errors.lastName && (
@@ -230,7 +230,7 @@ const Auth = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input-field pl-12"
-                  placeholder="you@university.edu"
+                  placeholder=""
                 />
               </div>
               {errors.email && (

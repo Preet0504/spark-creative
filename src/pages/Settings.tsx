@@ -105,7 +105,7 @@ export default function Settings() {
                   id="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Enter your first name"
+                  placeholder=""
                 />
               </div>
               <div className="space-y-2">
@@ -114,7 +114,7 @@ export default function Settings() {
                   id="lastName"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Enter your last name"
+                  placeholder=""
                 />
               </div>
             </div>
