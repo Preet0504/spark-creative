@@ -56,6 +56,7 @@ UniCourse is a production-ready student course management system that demonstrat
 |---------|-------------|
 | **Course Catalog** | Browse and search available courses with filters |
 | **Course Enrollment** | Enroll in courses with prerequisite validation |
+| **Schedule Conflict Detection** | Prevents enrolling in overlapping class times |
 | **Waitlist System** | Join waitlists for full sections |
 | **My Courses** | View enrolled courses with section details |
 | **Assignment Submissions** | Upload PDF, DOCX, or images for assignments |
@@ -187,6 +188,7 @@ src/
 │   ├── useAuth.ts       # Authentication state
 │   ├── useCourses.ts    # Course queries
 │   ├── useEnrollments.ts # Enrollment management
+│   ├── useScheduleConflicts.ts # Schedule conflict detection
 │   ├── useAssignments.ts # Assignment CRUD
 │   ├── useWaitlist.ts   # Waitlist operations
 │   └── ...              # Other data hooks
@@ -201,6 +203,7 @@ src/
 ├── lib/
 │   ├── utils.ts         # Utility functions
 │   ├── gradeUtils.ts    # GPA calculations
+│   ├── scheduleUtils.ts # Time conflict detection
 │   └── exportUtils.ts   # CSV export
 └── integrations/
     └── supabase/        # Generated Supabase types

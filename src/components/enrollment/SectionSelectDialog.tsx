@@ -3,6 +3,7 @@ import { useSectionsByCourse } from '@/hooks/useSections';
 import { useCourses } from '@/hooks/useCourses';
 import { usePrerequisiteCheck } from '@/hooks/usePrerequisites';
 import { useStudentWaitlist, useWaitlistMutations, useWaitlistBySection } from '@/hooks/useWaitlist';
+import { useScheduleConflicts } from '@/hooks/useScheduleConflicts';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Dialog,
@@ -13,8 +14,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Calendar, Clock, MapPin, Users, User, AlertTriangle, Clock3 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, User, AlertTriangle, Clock3, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { formatConflictMessage } from '@/lib/scheduleUtils';
 
 interface SectionSelectDialogProps {
   open: boolean;
@@ -38,6 +40,7 @@ const SectionSelectDialog = ({
   const { data: courses = [] } = useCourses();
   const { canEnroll, missingPrerequisites } = usePrerequisiteCheck(courseId, user?.id);
   const { data: studentWaitlist = [] } = useStudentWaitlist(user?.id);
+  const { checkConflicts } = useScheduleConflicts(user?.id);
   const { joinWaitlist } = useWaitlistMutations();
   const [joiningWaitlist, setJoiningWaitlist] = useState<string | null>(null);
 
@@ -108,12 +111,14 @@ const SectionSelectDialog = ({
             {sections.map(section => {
               const isFull = section.enrolled >= maxStudents;
               const onWaitlist = isOnWaitlist(section.id);
+              const conflicts = checkConflicts(section.id);
+              const hasConflict = conflicts.length > 0;
 
               return (
                 <div
                   key={section.id}
                   className={`p-4 rounded-lg border transition-colors ${
-                    !canEnroll
+                    !canEnroll || hasConflict
                       ? 'bg-muted/50 border-border cursor-not-allowed opacity-60'
                       : isFull
                         ? 'bg-muted/30 border-border'
@@ -129,6 +134,12 @@ const SectionSelectDialog = ({
                             Full
                           </Badge>
                         )}
+                        {hasConflict && (
+                          <Badge variant="outline" className="text-xs border-destructive/60 text-destructive">
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            Conflict
+                          </Badge>
+                        )}
                         {onWaitlist && (
                           <Badge variant="secondary" className="text-xs">
                             <Clock3 className="w-3 h-3 mr-1" />
@@ -136,6 +147,11 @@ const SectionSelectDialog = ({
                           </Badge>
                         )}
                       </div>
+                      {hasConflict && (
+                        <div className="mb-2 text-xs text-destructive bg-destructive/10 px-2 py-1 rounded">
+                          Conflicts with: {formatConflictMessage(conflicts)}
+                        </div>
+                      )}
                       <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4" />
@@ -160,7 +176,11 @@ const SectionSelectDialog = ({
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      {!isFull ? (
+                      {hasConflict ? (
+                        <Button variant="ghost" size="sm" disabled>
+                          Unavailable
+                        </Button>
+                      ) : !isFull ? (
                         <Button
                           onClick={() => onSelectSection(section.id)}
                           disabled={!canEnroll || isEnrolling}
