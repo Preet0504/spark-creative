@@ -155,7 +155,7 @@ export function SectionFormDialog({
                   <FormItem>
                     <FormLabel>Section Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="A" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -232,7 +232,7 @@ export function SectionFormDialog({
                   <FormItem>
                     <FormLabel>Time</FormLabel>
                     <FormControl>
-                      <Input placeholder="9:00 AM - 10:30 AM" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -245,7 +245,7 @@ export function SectionFormDialog({
                   <FormItem>
                     <FormLabel>Room</FormLabel>
                     <FormControl>
-                      <Input placeholder="Room 101" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

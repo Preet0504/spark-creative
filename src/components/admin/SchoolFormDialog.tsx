@@ -76,7 +76,7 @@ export function SchoolFormDialog({
                 <FormItem>
                   <FormLabel>School Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="School of Engineering" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,7 +89,7 @@ export function SchoolFormDialog({
                 <FormItem>
                   <FormLabel>Dean</FormLabel>
                   <FormControl>
-                    <Input placeholder="Dr. John Smith" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
