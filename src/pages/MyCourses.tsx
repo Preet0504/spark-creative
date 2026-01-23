@@ -166,13 +166,19 @@ const MyCourses = () => {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary flex items-center justify-center">
               <BookOpen className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">No courses enrolled</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {profile?.role === 'student' ? 'No courses enrolled' : 'No assigned courses'}
+            </h3>
             <p className="text-muted-foreground mb-4">
-              You haven't enrolled in any courses yet.
+              {profile?.role === 'student' 
+                ? "You haven't enrolled in any courses yet."
+                : 'You are not assigned to any courses this semester.'}
             </p>
-            <a href="/courses" className="btn-primary inline-block">
-              Browse Courses
-            </a>
+            {profile?.role === 'student' && (
+              <a href="/courses" className="btn-primary inline-block">
+                Browse Courses
+              </a>
+            )}
           </div>
         )}
       </div>

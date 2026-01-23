@@ -78,7 +78,7 @@ const GradeAssignmentDialog = ({ open, onOpenChange, enrollment }: GradeAssignme
               onValueChange={setSelectedGrade}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a grade" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {GRADES.map(grade => (

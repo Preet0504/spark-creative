@@ -141,13 +141,14 @@
 
 @layer components {
   .card-elevated {
-    @apply bg-card rounded-xl border border-border/50;
+    @apply bg-card rounded-xl border border-border/50 transition-all duration-300;
     box-shadow: var(--shadow-md);
     background: var(--gradient-card);
   }
 
   .card-elevated:hover {
     box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
   }
 
   .stat-card {
@@ -158,12 +159,12 @@
 
   .stat-card::before {
     content: '';
-    @apply absolute top-0 left-0 w-1 h-full bg-primary;
+    @apply absolute top-0 left-0 w-1 h-full bg-primary rounded-l-xl;
   }
 
   .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
   }
 
   .sidebar-link {
@@ -174,23 +175,29 @@
 
   .sidebar-link.active {
     @apply bg-sidebar-accent text-sidebar-foreground font-medium;
+    box-shadow: inset 3px 0 0 hsl(var(--sidebar-primary));
   }
 
   .input-field {
     @apply w-full px-4 py-3 rounded-lg border border-border bg-background;
     @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary;
-    @apply transition-all duration-200 placeholder:text-muted-foreground;
+    @apply transition-all duration-200 placeholder:text-muted-foreground/50;
+  }
+
+  .input-field:hover {
+    @apply border-primary/50;
   }
 
   .btn-primary {
     @apply px-6 py-3 rounded-lg font-semibold text-primary-foreground;
-    @apply transition-all duration-200 hover:opacity-90 active:scale-[0.98];
+    @apply transition-all duration-300 hover:opacity-90 active:scale-[0.98];
     background: var(--gradient-primary);
     box-shadow: var(--shadow-md);
   }
 
   .btn-primary:hover {
     box-shadow: var(--shadow-lg), var(--shadow-glow);
+    transform: translateY(-1px);
   }
 
   .course-card {
@@ -201,26 +208,31 @@
   }
 
   .course-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    border-color: hsl(var(--primary) / 0.3);
   }
 
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase;
   }
 
   .badge-teal {
-    @apply bg-primary/10 text-primary;
+    @apply bg-primary/15 text-primary;
   }
 
   .badge-success {
-    background: hsl(var(--success) / 0.1);
+    background: hsl(var(--success) / 0.15);
     color: hsl(var(--success));
   }
 
   .badge-warning {
-    background: hsl(var(--warning) / 0.1);
+    background: hsl(var(--warning) / 0.15);
     color: hsl(var(--warning));
+  }
+
+  .glass-card {
+    @apply backdrop-blur-sm bg-card/80 border border-border/30 rounded-xl;
   }
 }
 
@@ -231,15 +243,23 @@
   }
 
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+    animation: fadeIn 0.6s ease-out forwards;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.5s ease-out forwards;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .animate-slide-in-left {
-    animation: slideInLeft 0.3s ease-out forwards;
+    animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
   }
 
   @keyframes fadeIn {
@@ -250,7 +270,7 @@
   @keyframes slideUp {
     from { 
       opacity: 0; 
-      transform: translateY(20px); 
+      transform: translateY(24px); 
     }
     to { 
       opacity: 1; 
@@ -261,11 +281,31 @@
   @keyframes slideInLeft {
     from { 
       opacity: 0; 
-      transform: translateX(-20px); 
+      transform: translateX(-24px); 
     }
     to { 
       opacity: 1; 
       transform: translateX(0); 
+    }
+  }
+
+  @keyframes scaleIn {
+    from { 
+      opacity: 0; 
+      transform: scale(0.95); 
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+    }
+    to {
+      box-shadow: 0 0 30px hsl(var(--primary) / 0.4);
     }
   }
 }

@@ -220,7 +220,7 @@ export function CourseFormDialog({
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select..." />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

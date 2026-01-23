@@ -77,7 +77,6 @@ const CreateAnnouncementDialog = () => {
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Announcement title"
               required
             />
           </div>
@@ -88,7 +87,6 @@ const CreateAnnouncementDialog = () => {
               id="content"
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="Announcement content..."
               rows={4}
               required
             />

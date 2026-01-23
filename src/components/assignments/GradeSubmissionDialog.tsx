@@ -135,7 +135,6 @@ const GradeSubmissionDialog = ({
               id="feedback"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Provide feedback to the student..."
               rows={4}
             />
           </div>

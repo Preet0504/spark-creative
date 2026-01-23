@@ -170,7 +170,7 @@ export function SectionFormDialog({
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a teacher..." />
+                          <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

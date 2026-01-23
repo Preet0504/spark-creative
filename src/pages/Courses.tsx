@@ -125,7 +125,6 @@ const Courses = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search courses by name, code, or description..."
                 className="input-field pl-12"
               />
             </div>
