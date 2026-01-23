@@ -33,12 +33,12 @@ const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
                 {course.semester}
               </span>
             </div>
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
               {course.title}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">{course.schools?.name}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
             <BookOpen className="w-6 h-6 text-primary" />
           </div>
         </div>
@@ -46,8 +46,8 @@ const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
 
       {/* Body */}
       <div className="p-5">
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-          {course.description}
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+          {course.description || 'No description available.'}
         </p>
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
@@ -62,15 +62,18 @@ const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
         </div>
 
         {course.prerequisites && course.prerequisites.length > 0 && (
-          <p className="text-xs text-muted-foreground mb-4">
-            Prerequisites: {course.prerequisites.length} course(s) required
-          </p>
+          <div className="text-xs text-muted-foreground mb-4 px-3 py-2 rounded-lg bg-secondary/50">
+            <span className="font-medium">Prerequisites:</span> {course.prerequisites.length} course(s) required
+          </div>
         )}
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-border/50">
           {isEnrolled ? (
-            <span className="badge badge-success">Enrolled</span>
+            <span className="badge badge-success flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+              Enrolled
+            </span>
           ) : onEnroll ? (
             <button
               onClick={() => onEnroll(course.id)}
@@ -78,10 +81,12 @@ const CourseCard = ({ course, onEnroll, isEnrolled }: CourseCardProps) => {
             >
               Enroll Now
             </button>
-          ) : null}
-          <button className="flex items-center gap-1 text-sm text-primary font-medium hover:underline">
+          ) : (
+            <span className="text-sm text-muted-foreground">View Only</span>
+          )}
+          <button className="flex items-center gap-1 text-sm text-primary font-medium hover:underline group/link">
             View Details
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>

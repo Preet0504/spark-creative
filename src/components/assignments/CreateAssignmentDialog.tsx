@@ -107,7 +107,7 @@ const CreateAssignmentDialog = ({
             <Label htmlFor="section">Section *</Label>
             <Select value={sectionId} onValueChange={setSectionId} required>
               <SelectTrigger>
-                <SelectValue placeholder="Select a section" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {sections.map(section => (
@@ -125,7 +125,6 @@ const CreateAssignmentDialog = ({
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Assignment title"
               required
             />
           </div>
@@ -136,7 +135,6 @@ const CreateAssignmentDialog = ({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Assignment instructions..."
               rows={4}
             />
           </div>
