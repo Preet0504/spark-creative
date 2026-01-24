@@ -193,27 +193,23 @@ const Dashboard = () => {
             <StatCard
               title="Teaching Courses"
               value={teacherCourses.length}
-              subtitle="This semester"
               icon={BookOpen}
             />
             <StatCard
               title="Total Students"
               value={totalTeacherStudents}
-              subtitle="Across all sections"
               icon={Users}
               variant="primary"
             />
             <StatCard
               title="Sections"
               value={teacherSections.length}
-              subtitle="Active sections"
               icon={Calendar}
               variant="success"
             />
             <StatCard
               title="Avg. Enrolled"
               value={teacherSections.length > 0 ? Math.round(totalTeacherStudents / teacherSections.length) : 0}
-              subtitle="Per section"
               icon={TrendingUp}
             />
           </div>
