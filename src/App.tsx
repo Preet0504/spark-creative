@@ -19,6 +19,7 @@ import Assignments from "./pages/Assignments";
 import Grades from "./pages/Grades";
 import Announcements from "./pages/Announcements";
 import Chat from "./pages/Chat";
+import Students from "./pages/Students";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,7 +60,7 @@ const App = () => (
           } />
           <Route path="/students" element={
             <ProtectedRoute allowedRoles={['teacher', 'admin']}>
-              <Dashboard />
+              <Students />
             </ProtectedRoute>
           } />
           <Route path="/analytics" element={
