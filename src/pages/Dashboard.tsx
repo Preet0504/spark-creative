@@ -362,18 +362,18 @@ const Dashboard = () => {
                 <span className="font-medium text-foreground">Manage Courses</span>
               </button>
               <button
-                onClick={() => navigate('/schedule')}
-                className="w-full flex items-center gap-3 p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors text-left"
-              >
-                <Calendar className="w-5 h-5 text-primary" />
-                <span className="font-medium text-foreground">View Schedule</span>
-              </button>
-              <button
-                onClick={() => navigate('/my-courses')}
+                onClick={() => navigate('/users')}
                 className="w-full flex items-center gap-3 p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors text-left"
               >
                 <Users className="w-5 h-5 text-primary" />
-                <span className="font-medium text-foreground">View Enrollments</span>
+                <span className="font-medium text-foreground">Manage Users</span>
+              </button>
+              <button
+                onClick={() => navigate('/schools')}
+                className="w-full flex items-center gap-3 p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors text-left"
+              >
+                <Building2 className="w-5 h-5 text-primary" />
+                <span className="font-medium text-foreground">Manage Schools</span>
               </button>
             </div>
 
