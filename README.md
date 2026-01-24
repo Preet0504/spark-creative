@@ -1,8 +1,8 @@
-# 🎓 UniCourse - Learning Management System
+# 🎓 Aca-D-ashboard - Learning Management System
 
 <div align="center">
 
-![UniCourse](https://img.shields.io/badge/UniCourse-Learning%20Management%20System-21808D?style=for-the-badge&logo=graduation-cap&logoColor=white)
+![Aca-d-ashboard](https://img.shields.io/badge/UniCourse-Learning%20Management%20System-21808D?style=for-the-badge&logo=graduation-cap&logoColor=white)
 
 A comprehensive, production-ready Learning Management System (LMS) built with modern web technologies. UniCourse provides role-based access control, real-time data management, and an elegant, responsive user interface for managing university courses, enrollments, assignments, and grades.
 
@@ -46,7 +46,7 @@ Educational institutions face significant challenges in managing course operatio
 
 5. **Scalability Issues**: Legacy systems struggle to handle concurrent users during peak registration periods.
 
-**UniCourse addresses these challenges** by providing a unified, secure, and user-friendly platform that streamlines the entire academic workflow from course creation to grade assignment.
+**Aca-d-ashboard addresses these challenges** by providing a unified, secure, and user-friendly platform that streamlines the entire academic workflow from course creation to grade assignment.
 
 ---
 
@@ -445,8 +445,8 @@ Contributions, issues, and feature requests are welcome!
 
 <div align="center">
 
-**Built with ❤️ using React, TypeScript, and Supabase**
+**Built with using React, TypeScript, and Supabase**
 
-[⬆ Back to Top](#-unicourse---learning-management-system)
+[⬆ Back to Top](#-acadashboard---learning-management-system)
 
 </div>
