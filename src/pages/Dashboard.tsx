@@ -94,28 +94,24 @@ const Dashboard = () => {
             <StatCard
               title="Enrolled Courses"
               value={enrolledCourses.length}
-              subtitle="This semester"
               icon={BookOpen}
             />
             <StatCard
               title="Total Credits"
               value={totalCredits}
-              subtitle="of 18 max credits"
               icon={Award}
               variant="primary"
             />
             <StatCard
-              title="GPA"
-              value="N/A"
-              subtitle="Grades not posted"
-              icon={TrendingUp}
+              title="Sections"
+              value={enrollments.length}
+              icon={Calendar}
               variant="success"
             />
             <StatCard
-              title="Upcoming"
-              value={enrolledCourses.length}
-              subtitle="Classes today"
-              icon={Calendar}
+              title="Assignments"
+              value="-"
+              icon={TrendingUp}
             />
           </div>
 

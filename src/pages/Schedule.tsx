@@ -6,13 +6,30 @@ import { useAuth } from '@/hooks/useAuth';
 import { MapPin, BookOpen, Loader2 } from 'lucide-react';
 
 const Schedule = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { data: courses = [], isLoading: coursesLoading } = useCourses();
   const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments(user?.id);
-  const { data: sections = [] } = useSections();
+  const { data: sections = [], isLoading: sectionsLoading } = useSections();
 
+  const isTeacher = profile?.role === 'teacher';
+
+  // For teachers: get sections where they are instructor
+  const teacherSections = sections.filter(s => 
+    s.instructor_id === user?.id || 
+    (profile?.lastName && s.instructor.toLowerCase().includes(profile.lastName.toLowerCase()))
+  );
+  const teacherCourseIds = [...new Set(teacherSections.map(s => s.course_id))];
+  const teacherCourses = courses.filter(c => teacherCourseIds.includes(c.id));
+
+  // For students: get enrolled courses
   const enrolledCourses = courses.filter(c => 
     enrollments.some(e => e.course_id === c.id)
+  );
+
+  // Use teacher courses or student enrolled courses based on role
+  const displayCourses = isTeacher ? teacherCourses : enrolledCourses;
+  const displaySections = isTeacher ? teacherSections : sections.filter(s => 
+    enrollments.some(e => e.section_id === s.id)
   );
 
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -28,8 +45,8 @@ const Schedule = () => {
     scheduleData[day] = [];
   });
 
-  enrolledCourses.forEach(course => {
-    const section = sections.find(s => s.course_id === course.id);
+  displayCourses.forEach(course => {
+    const section = displaySections.find(s => s.course_id === course.id);
     if (section) {
       section.schedule.days.forEach((day: string) => {
         const timeMatch = section.schedule.time.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
@@ -58,7 +75,7 @@ const Schedule = () => {
     'bg-teal-200/50 border-teal-400/40 text-teal-700',
   ];
 
-  const isLoading = coursesLoading || enrollmentsLoading;
+  const isLoading = coursesLoading || enrollmentsLoading || sectionsLoading;
 
   if (isLoading) {
     return (
@@ -81,18 +98,20 @@ const Schedule = () => {
           </p>
         </div>
 
-        {enrolledCourses.length === 0 ? (
+        {displayCourses.length === 0 ? (
           <div className="text-center py-16 card-elevated">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary flex items-center justify-center">
               <BookOpen className="w-8 h-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">No classes scheduled</h3>
             <p className="text-muted-foreground mb-4">
-              Enroll in courses to see your schedule.
+              {isTeacher ? 'No sections assigned to you yet.' : 'Enroll in courses to see your schedule.'}
             </p>
-            <a href="/courses" className="btn-primary inline-block">
-              Browse Courses
-            </a>
+            {!isTeacher && (
+              <a href="/courses" className="btn-primary inline-block">
+                Browse Courses
+              </a>
+            )}
           </div>
         ) : (
           <>
@@ -123,7 +142,7 @@ const Schedule = () => {
                           </td>
                           {days.map(day => {
                             const item = getScheduleItem(day, hour);
-                            const colorIndex = item ? enrolledCourses.findIndex(c => c.id === item.course.id) % colors.length : 0;
+                            const colorIndex = item ? displayCourses.findIndex(c => c.id === item.course.id) % colors.length : 0;
                             
                             return (
                               <td key={day} className="p-2 align-top h-20">
@@ -156,9 +175,9 @@ const Schedule = () => {
             <div className="mt-6 card-elevated p-4">
               <h3 className="font-medium text-foreground mb-4">Your Courses</h3>
               <div className="flex flex-wrap gap-4">
-                {enrolledCourses.map((course, i) => {
+                {displayCourses.map((course, i) => {
                   const colorIndex = i % colors.length;
-                  const section = sections.find(s => s.course_id === course.id);
+                  const section = displaySections.find(s => s.course_id === course.id);
                   
                   return (
                     <div 

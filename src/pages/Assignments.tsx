@@ -3,13 +3,13 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useSections } from '@/hooks/useSections';
 import { useCourses } from '@/hooks/useCourses';
-import { useAllUsersWithRoles } from '@/hooks/useUsers';
 import {
   useTeacherAssignments,
   useStudentAssignments,
   useSubmissions,
   Assignment,
   AssignmentSubmission,
+  SubmissionWithStudent,
   getSignedUrl,
 } from '@/hooks/useAssignments';
 import { Button } from '@/components/ui/button';
@@ -66,7 +66,7 @@ const Assignments = () => {
   const { user, profile } = useAuth();
   const { data: sections = [] } = useSections();
   const { data: courses = [] } = useCourses();
-  const { data: users = [] } = useAllUsersWithRoles();
+  
   
   const isTeacherOrAdmin = profile?.role === 'teacher' || profile?.role === 'admin';
   
@@ -106,10 +106,6 @@ const Assignments = () => {
     return section ? `Section ${section.section}` : '';
   };
 
-  const getStudentName = (studentId: string) => {
-    const user = users.find(u => u.id === studentId);
-    return user ? `${user.firstName} ${user.lastName}` : 'Unknown Student';
-  };
 
   const getDueStatus = (dueDate: string | null) => {
     if (!dueDate) return null;
@@ -126,9 +122,9 @@ const Assignments = () => {
     setSelectedAssignment(assignment);
   };
 
-  const handleGradeSubmission = (submission: AssignmentSubmission) => {
+  const handleGradeSubmission = (submission: SubmissionWithStudent) => {
     setSelectedSubmission(submission);
-    setSelectedStudentName(getStudentName(submission.student_id));
+    setSelectedStudentName(submission.studentName);
     setGradeDialogOpen(true);
   };
 
@@ -282,7 +278,7 @@ const Assignments = () => {
                     {submissions.map(submission => (
                       <TableRow key={submission.id}>
                         <TableCell className="font-medium">
-                          {getStudentName(submission.student_id)}
+                          {submission.studentName}
                         </TableCell>
                         <TableCell>
                           <SubmissionFileLink filePath={submission.file_url} fileName={submission.file_name} />

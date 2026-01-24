@@ -117,17 +117,47 @@ export const useTeacherAssignments = (instructorId?: string) => {
   });
 };
 
+export interface SubmissionWithStudent extends AssignmentSubmission {
+  studentName: string;
+}
+
 export const useSubmissions = (assignmentId?: string) => {
   return useQuery({
     queryKey: ['submissions', assignmentId],
     queryFn: async () => {
       if (!assignmentId) return [];
-      const { data, error } = await supabase
+      
+      // Fetch submissions
+      const { data: submissions, error } = await supabase
         .from('assignment_submissions')
         .select('*')
         .eq('assignment_id', assignmentId);
       if (error) throw error;
-      return data as AssignmentSubmission[];
+      
+      if (!submissions || submissions.length === 0) return [];
+      
+      // Fetch student profiles for these submissions
+      const studentIds = [...new Set(submissions.map(s => s.student_id))];
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', studentIds);
+      
+      if (profileError) {
+        console.error('Error fetching student profiles:', profileError);
+      }
+      
+      // Create a map of student id to name
+      const studentNameMap: Record<string, string> = {};
+      (profiles || []).forEach(p => {
+        studentNameMap[p.id] = `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Unknown Student';
+      });
+      
+      // Return submissions with student names
+      return submissions.map(s => ({
+        ...s,
+        studentName: studentNameMap[s.student_id] || 'Unknown Student',
+      })) as SubmissionWithStudent[];
     },
     enabled: !!assignmentId,
   });
