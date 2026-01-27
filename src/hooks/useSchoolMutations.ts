@@ -4,13 +4,13 @@ import { toast } from '@/hooks/use-toast';
 
 interface CreateSchoolData {
   name: string;
-  dean: string;
+  dean_id: string | null;
 }
 
 interface UpdateSchoolData {
   id: string;
   name: string;
-  dean: string;
+  dean_id: string | null;
 }
 
 export function useCreateSchool() {
@@ -20,7 +20,7 @@ export function useCreateSchool() {
     mutationFn: async (data: CreateSchoolData) => {
       const { data: school, error } = await supabase
         .from('schools')
-        .insert(data)
+        .insert({ name: data.name, dean: '', dean_id: data.dean_id })
         .select()
         .single();
 
@@ -41,10 +41,10 @@ export function useUpdateSchool() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...data }: UpdateSchoolData) => {
+    mutationFn: async ({ id, name, dean_id }: UpdateSchoolData) => {
       const { data: school, error } = await supabase
         .from('schools')
-        .update(data)
+        .update({ name, dean: '', dean_id })
         .eq('id', id)
         .select()
         .single();

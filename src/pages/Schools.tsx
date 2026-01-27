@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { useSchools } from '@/hooks/useSchools';
+import { useSchools, getDeanDisplayName } from '@/hooks/useSchools';
 import { useCourses } from '@/hooks/useCourses';
 import { useCreateSchool, useUpdateSchool, useDeleteSchool } from '@/hooks/useSchoolMutations';
 import { SchoolFormDialog } from '@/components/admin/SchoolFormDialog';
@@ -20,7 +20,7 @@ import { Plus, Pencil, Trash2, Loader2, GraduationCap } from 'lucide-react';
 interface School {
   id: string;
   name: string;
-  dean: string;
+  dean_id: string | null;
 }
 
 export default function Schools() {
@@ -53,7 +53,7 @@ export default function Schools() {
     setDeleteOpen(true);
   };
 
-  const handleSubmit = (data: { name: string; dean: string }) => {
+  const handleSubmit = (data: { name: string; dean_id: string | null }) => {
     if (selectedSchool) {
       updateSchool.mutate({ id: selectedSchool.id, ...data }, {
         onSuccess: () => setFormOpen(false),
@@ -121,7 +121,7 @@ export default function Schools() {
                   {schools?.map((school) => (
                     <TableRow key={school.id}>
                       <TableCell className="font-medium">{school.name}</TableCell>
-                      <TableCell>{school.dean}</TableCell>
+                      <TableCell>{getDeanDisplayName(school)}</TableCell>
                       <TableCell>{getCourseCount(school.id)}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">

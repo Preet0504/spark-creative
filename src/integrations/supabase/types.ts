@@ -322,22 +322,33 @@ export type Database = {
         Row: {
           created_at: string
           dean: string
+          dean_id: string | null
           id: string
           name: string
         }
         Insert: {
           created_at?: string
           dean: string
+          dean_id?: string | null
           id?: string
           name: string
         }
         Update: {
           created_at?: string
           dean?: string
+          dean_id?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "schools_dean_id_fkey"
+            columns: ["dean_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
