@@ -16,12 +16,20 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useAllUsersWithRoles } from '@/hooks/useUsers';
 
 const schoolSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  dean: z.string().min(1, 'Dean is required').max(100),
+  dean_id: z.string().nullable(),
 });
 
 type SchoolFormValues = z.infer<typeof schoolSchema>;
@@ -30,7 +38,7 @@ interface SchoolFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: SchoolFormValues) => void;
-  initialData?: { id: string; name: string; dean: string } | null;
+  initialData?: { id: string; name: string; dean_id: string | null } | null;
   isLoading?: boolean;
 }
 
@@ -41,19 +49,24 @@ export function SchoolFormDialog({
   initialData,
   isLoading,
 }: SchoolFormDialogProps) {
+  const { data: users = [] } = useAllUsersWithRoles();
+  
+  // Filter to show admins and teachers as potential deans
+  const eligibleDeans = users.filter(u => u.role === 'admin' || u.role === 'teacher');
+
   const form = useForm<SchoolFormValues>({
     resolver: zodResolver(schoolSchema),
     defaultValues: {
       name: '',
-      dean: '',
+      dean_id: null,
     },
   });
 
   useEffect(() => {
     if (initialData) {
-      form.reset({ name: initialData.name, dean: initialData.dean });
+      form.reset({ name: initialData.name, dean_id: initialData.dean_id });
     } else {
-      form.reset({ name: '', dean: '' });
+      form.reset({ name: '', dean_id: null });
     }
   }, [initialData, form]);
 
@@ -84,13 +97,28 @@ export function SchoolFormDialog({
             />
             <FormField
               control={form.control}
-              name="dean"
+              name="dean_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Dean</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
+                  <Select
+                    value={field.value || 'none'}
+                    onValueChange={(value) => field.onChange(value === 'none' ? null : value)}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a dean" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">No dean assigned</SelectItem>
+                      {eligibleDeans.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.firstName || ''} {user.lastName || ''} ({user.role})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useCourses } from '@/hooks/useCourses';
-import { useSchools } from '@/hooks/useSchools';
+import { useSchools, getDeanDisplayName } from '@/hooks/useSchools';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { useSections } from '@/hooks/useSections';
 import { useUsersByRole } from '@/hooks/useUsers';
@@ -14,7 +14,6 @@ import {
   BookOpen, 
   Users, 
   GraduationCap, 
-  TrendingUp, 
   Calendar,
   Clock,
   Award,
@@ -109,9 +108,9 @@ const Dashboard = () => {
               variant="success"
             />
             <StatCard
-              title="Assignments"
-              value="-"
-              icon={TrendingUp}
+              title="Schools"
+              value={schools.length}
+              icon={Building2}
             />
           </div>
 
@@ -206,7 +205,7 @@ const Dashboard = () => {
             <StatCard
               title="Avg. Enrolled"
               value={teacherSections.length > 0 ? Math.round(totalTeacherStudents / teacherSections.length) : 0}
-              icon={TrendingUp}
+              icon={Users}
             />
           </div>
 
@@ -325,7 +324,7 @@ const Dashboard = () => {
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-foreground">{school.name}</p>
-                        <p className="text-sm text-muted-foreground">Dean: {school.dean}</p>
+                        <p className="text-sm text-muted-foreground">Dean: {getDeanDisplayName(school)}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-foreground">{schoolCourses.length}</p>
