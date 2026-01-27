@@ -41,13 +41,8 @@ const Dashboard = () => {
 
   const totalCredits = enrolledCourses.reduce((sum, c) => sum + c.credits, 0);
 
-  // Get teacher's name for matching sections
-  const teacherFullName = profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() : '';
-  
-  // Filter sections taught by this teacher (match by last name in instructor field)
-  const teacherSections = sections.filter(s => 
-    profile?.lastName && s.instructor.toLowerCase().includes(profile.lastName.toLowerCase())
-  );
+  // Filter sections taught by this teacher using instructor_id
+  const teacherSections = sections.filter(s => s.instructor_id === user?.id);
   
   // Get courses taught by this teacher
   const teacherCourseIds = [...new Set(teacherSections.map(s => s.course_id))];
