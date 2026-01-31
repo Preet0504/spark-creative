@@ -62,7 +62,7 @@ const Sidebar = () => {
             <GraduationCap className="w-6 h-6 text-sidebar-foreground" />
           </div>
           <div>
-            <h1 className="font-bold text-sidebar-foreground text-lg">UniCourse</h1>
+            <h1 className="font-bold text-sidebar-foreground text-lg">Aca-D-ashboard</h1>
             <p className="text-xs text-sidebar-foreground/60 capitalize">{user?.role} Portal</p>
           </div>
         </Link>
