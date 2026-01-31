@@ -20,6 +20,7 @@ import Grades from "./pages/Grades";
 import Announcements from "./pages/Announcements";
 import Chat from "./pages/Chat";
 import Students from "./pages/Students";
+import Materials from "./pages/Materials";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +107,11 @@ const App = () => (
           <Route path="/chat" element={
             <ProtectedRoute>
               <Chat />
+            </ProtectedRoute>
+          } />
+          <Route path="/materials" element={
+            <ProtectedRoute>
+              <Materials />
             </ProtectedRoute>
           } />
           <Route path="*" element={<NotFound />} />

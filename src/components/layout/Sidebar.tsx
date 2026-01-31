@@ -12,7 +12,8 @@ import {
   BarChart3,
   MessageSquare,
   ClipboardList,
-  FileText
+  FileText,
+  FolderOpen
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -23,6 +24,7 @@ const Sidebar = () => {
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/courses', icon: BookOpen, label: 'Course Catalog' },
     { to: '/my-courses', icon: ClipboardList, label: 'My Courses' },
+    { to: '/materials', icon: FolderOpen, label: 'Materials' },
     { to: '/assignments', icon: FileText, label: 'Assignments' },
     { to: '/grades', icon: BarChart3, label: 'Grades' },
     { to: '/schedule', icon: Calendar, label: 'Schedule' },
@@ -32,6 +34,7 @@ const Sidebar = () => {
   const teacherLinks = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/my-courses', icon: BookOpen, label: 'My Courses' },
+    { to: '/materials', icon: FolderOpen, label: 'Materials' },
     { to: '/assignments', icon: FileText, label: 'Assignments' },
     { to: '/grading', icon: ClipboardList, label: 'Grading' },
     { to: '/students', icon: Users, label: 'Students' },

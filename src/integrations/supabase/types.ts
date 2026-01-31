@@ -151,6 +151,72 @@ export type Database = {
           },
         ]
       }
+      course_materials: {
+        Row: {
+          content: string | null
+          course_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          link_url: string | null
+          order_index: number
+          section_id: string
+          title: string
+          type: Database["public"]["Enums"]["material_type"]
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          course_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          link_url?: string | null
+          order_index?: number
+          section_id: string
+          title: string
+          type?: Database["public"]["Enums"]["material_type"]
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          course_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          link_url?: string | null
+          order_index?: number
+          section_id?: string
+          title?: string
+          type?: Database["public"]["Enums"]["material_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_materials_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "course_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_sections: {
         Row: {
           course_id: string
@@ -437,6 +503,7 @@ export type Database = {
     Enums: {
       app_role: "student" | "teacher" | "admin"
       enrollment_status: "enrolled" | "pending" | "dropped"
+      material_type: "file" | "link" | "text"
       semester_type: "fall" | "spring" | "summer"
     }
     CompositeTypes: {
@@ -567,6 +634,7 @@ export const Constants = {
     Enums: {
       app_role: ["student", "teacher", "admin"],
       enrollment_status: ["enrolled", "pending", "dropped"],
+      material_type: ["file", "link", "text"],
       semester_type: ["fall", "spring", "summer"],
     },
   },
