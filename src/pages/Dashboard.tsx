@@ -48,8 +48,20 @@ const Dashboard = () => {
   const teacherCourseIds = [...new Set(teacherSections.map(s => s.course_id))];
   const teacherCourses = courses.filter(c => teacherCourseIds.includes(c.id));
   
-  // Total students in teacher's sections
-  const totalTeacherStudents = teacherSections.reduce((sum, s) => sum + s.enrolled, 0);
+  // Teacher enrollments derived from actual enrollment records (more reliable than
+  // the denormalized `course_sections.enrolled` counter)
+  const teacherEnrollmentsAll = allEnrollments.filter((e: any) =>
+    teacherCourseIds.includes(e.course_id) && (e.status ? e.status === 'enrolled' : true)
+  );
+
+  const uniqueTeacherStudentIds = new Set(
+    teacherEnrollmentsAll.map((e: any) => e.student_id)
+  );
+
+  const totalTeacherStudents = uniqueTeacherStudentIds.size;
+  const avgTeacherEnrolled = teacherSections.length > 0
+    ? Math.round(teacherEnrollmentsAll.length / teacherSections.length)
+    : 0;
   
   // Get recent enrollments for teacher's courses
   const teacherEnrollments = allEnrollments.filter(e => 
@@ -199,7 +211,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Avg. Enrolled"
-              value={teacherSections.length > 0 ? Math.round(totalTeacherStudents / teacherSections.length) : 0}
+              value={avgTeacherEnrolled}
               icon={Users}
             />
           </div>
