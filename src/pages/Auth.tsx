@@ -125,7 +125,7 @@ const Auth = () => {
             <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
               <GraduationCap className="w-7 h-7 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">UniCourse</span>
+            <span className="text-2xl font-bold text-white">Aca-D-ashboard</span>
           </div>
         </div>
 
@@ -141,7 +141,7 @@ const Auth = () => {
         </div>
 
         <div className="relative z-10 text-white/60 text-sm">
-          © 2024 UniCourse. All rights reserved.
+          © 2024 Aca-D-ashboard. All rights reserved.
         </div>
       </div>
 
@@ -153,7 +153,7 @@ const Auth = () => {
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <GraduationCap className="w-7 h-7 text-primary" />
             </div>
-            <span className="text-2xl font-bold text-foreground">UniCourse</span>
+            <span className="text-2xl font-bold text-foreground">Aca-D-ashboard</span>
           </div>
 
           <div className="text-center mb-8">
