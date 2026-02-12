@@ -21,6 +21,7 @@ import Announcements from "./pages/Announcements";
 import Chat from "./pages/Chat";
 import Students from "./pages/Students";
 import Materials from "./pages/Materials";
+import Discussion from "./pages/Discussion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -112,6 +113,11 @@ const App = () => (
           <Route path="/materials" element={
             <ProtectedRoute>
               <Materials />
+            </ProtectedRoute>
+          } />
+          <Route path="/discussion" element={
+            <ProtectedRoute>
+              <Discussion />
             </ProtectedRoute>
           } />
           <Route path="*" element={<NotFound />} />

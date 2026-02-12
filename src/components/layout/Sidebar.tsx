@@ -28,6 +28,7 @@ const Sidebar = () => {
     { to: '/assignments', icon: FileText, label: 'Assignments' },
     { to: '/grades', icon: BarChart3, label: 'Grades' },
     { to: '/schedule', icon: Calendar, label: 'Schedule' },
+    { to: '/discussion', icon: MessageSquare, label: 'Discussion' },
     { to: '/chat', icon: MessageSquare, label: 'AI Assistant' },
   ];
 
@@ -38,6 +39,7 @@ const Sidebar = () => {
     { to: '/assignments', icon: FileText, label: 'Assignments' },
     { to: '/grading', icon: ClipboardList, label: 'Grading' },
     { to: '/students', icon: Users, label: 'Students' },
+    { to: '/discussion', icon: MessageSquare, label: 'Discussion' },
     { to: '/schedule', icon: Calendar, label: 'Schedule' },
   ];
 
